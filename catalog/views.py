@@ -3,12 +3,11 @@ from django.shortcuts import render
 from catalog.models import Product
 
 
-# Create your views here.
 def home(request):
     # print(Product.objects.all()[:5])
     context = {
         'objects_list': Product.objects.all(),
-        'title': 'Магазин - главная'
+        'title': 'Каталог'
     }
     return render(request, 'catalog/home.html', context)
 

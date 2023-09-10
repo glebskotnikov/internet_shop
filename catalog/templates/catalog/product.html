@@ -1,9 +1,9 @@
 {% extends 'catalog/base.html' %}
-
+{% load my_tags %}
 {% block content %}
 <div class="row text-center">
     <div class="card" style="width: 20rem;">
-        <img src="#" class="card-img-top" alt="...">
+        <img src="{{ object.photo|mediapath }}" class="card-img-top" alt="...">
         <div class="card-body">
             <h4 class="card-title">{{ object.name }}</h4>
             <p class="card-text">{{ object.description }}</p>
