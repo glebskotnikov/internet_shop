@@ -1,16 +1,23 @@
 {% extends 'catalog/base.html' %}
 {% load my_tags %}
 {% block content %}
-<div class="row text-center">
-    <div class="card" style="width: 20rem;">
-        <img src="{{ object.photo|mediapath }}" class="card-img-top" alt="...">
-        <div class="card-body">
-            <h4 class="card-title">{{ object.name }}</h4>
-            <p class="card-text">{{ object.description }}</p>
-            <p class="card-text">Категория: {{ object.category }}</p>
-            <p class="card-text">Цена: {{ object.price }} руб.</p>
-            <a href="{% url 'catalog:home' %}" class="btn btn-primary">К товарам</a>
+    <div class="row text-center">
+        <div class="card" style="width: 20rem;">
+            <img src="{{ object.photo|mediapath }}" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h4 class="card-title">{{ object.name }}</h4>
+                <p class="card-text">{{ object.description }}</p>
+                <p class="card-text">Категория: {{ object.category }}</p>
+                <p class="card-text">Цена: {{ object.price }} руб.</p>
+                <div class="btn-group">
+                    <a href="{% url 'catalog:home' %}" type="button"
+                       class="btn btn-outline-secondary">Назад</a>
+                    <a href="{% url 'catalog:update_product' object.pk %}" type="button"
+                       class="btn btn-sm btn-outline-secondary">Edit</a>
+                    <a href="{% url 'catalog:delete_product' object.pk %}" type="button"
+                       class="btn btn-sm btn-outline-danger">Delete</a>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}
