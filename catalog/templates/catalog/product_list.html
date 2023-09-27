@@ -11,6 +11,9 @@
                     <div class="card-body">
                         <h4 class="card-title pricing-card-title">{{ object.name }}</h4>
                         <h6 class="card-title pricing-card-title">{{ object.description|truncatechars:100 }}</h6>
+                            {% if object.vers.current_version %}
+                            <p class="card-footer">Версия: {{ object.vers.number_version }}</p>
+                        {% endif %}
                         <a href="{% url 'catalog:view_product' object.id %}"
                            class="btn btn-outline-secondary">Подробнее</a>
                     </div>

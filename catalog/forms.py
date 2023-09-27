@@ -1,6 +1,6 @@
 from django import forms
 
-from catalog.models import Product
+from catalog.models import Product, Version
 
 forbidden_words = ['казино', 'криптовалюта', 'крипта', 'биржа', 'дешево', 'бесплатно', 'обман', 'полиция', 'радар']
 
@@ -13,7 +13,6 @@ class StyleFormMixin:
 
 
 class ProductForm(StyleFormMixin, forms.ModelForm):
-
     class Meta:
         model = Product
         exclude = ('date_of_creation', 'date_last_modified')
@@ -35,3 +34,10 @@ class ProductForm(StyleFormMixin, forms.ModelForm):
                 raise forms.ValidationError('Вы использовали запрещенное слово в описании')
 
         return cleaned_data
+
+
+class VersionForm(forms.ModelForm):
+    class Meta:
+        model = Version
+        exclude = ('product', )
+
