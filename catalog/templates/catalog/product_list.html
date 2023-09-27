@@ -1,17 +1,24 @@
 {% extends 'catalog/base.html' %}
 
 {% block content %}
-<div class="row text-center">
-    {% for object in object_list %}
-    <div class="col-3">
-        <div class="card">
-            <div class="card-body">
-                <h4 class="card-title pricing-card-title">{{ object.name }}</h4>
-                <h6 class="card-title pricing-card-title">{{ object.description|truncatechars:100}}</h6>
-                <a href="{% url 'catalog:view_product' object.id %}" class="btn btn-outline-primary">Подробнее</a>
-            </div>
+    <div class="row text-center">
+        <div class="col-12 mb-5">
+            <a class="btn btn-outline-primary" href="{% url 'catalog:create_product' %}">Создать продукт</a>
         </div>
+        {% for object in object_list %}
+            <div class="col-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title pricing-card-title">{{ object.name }}</h4>
+                        <h6 class="card-title pricing-card-title">{{ object.description|truncatechars:100 }}</h6>
+                            {% if object.vers.current_version %}
+                            <p class="card-footer">Версия: {{ object.vers.number_version }}</p>
+                        {% endif %}
+                        <a href="{% url 'catalog:view_product' object.id %}"
+                           class="btn btn-outline-secondary">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-</div>
 {% endblock %}
