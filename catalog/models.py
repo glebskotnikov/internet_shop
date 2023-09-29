@@ -23,7 +23,6 @@ class Product(models.Model):
     price = models.IntegerField(verbose_name='Цена за покупку')
     date_of_creation = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания', **NULLABLE)
     date_last_modified = models.DateTimeField(verbose_name='Дата последнего изменения', **NULLABLE)
-    vers = models.ForeignKey('Version', on_delete=models.DO_NOTHING, verbose_name='Версия', **NULLABLE)
 
     def __str__(self):
         return f'{self.name} ({self.category})'
@@ -34,13 +33,13 @@ class Product(models.Model):
 
 
 class Version(models.Model):
-    prod = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукт')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='versions', **NULLABLE)
     number_version = models.PositiveIntegerField(verbose_name='Номер версии')
     name = models.CharField(max_length=150, verbose_name='Название')
     current_version = models.BooleanField(verbose_name='признак текущей версии', default=False)
 
     def __str__(self):
-        return f'{self.prod.name} ({self.number_version})'
+        return f'{self.product.name} ({self.number_version})'
 
     class Meta:
         verbose_name = 'версия'
