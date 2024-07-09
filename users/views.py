@@ -8,8 +8,8 @@ from django.contrib.auth.views import LogoutView as LogoutBaseView
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
-from django.views.generic import CreateView, FormView
-from users.forms import UserRegisterForm, UserPasswordResetForm
+from django.views.generic import CreateView, FormView, UpdateView
+from users.forms import UserRegisterForm, UserPasswordResetForm, UserProfileForm
 from users.models import User
 from config import settings
 
@@ -73,3 +73,12 @@ class PasswordResetView(FormView):
                 recipient_list=[user.email]
             )
         return super().form_valid(form)
+
+
+class ProfileView(UpdateView):
+    model = User
+    form_class = UserProfileForm
+    success_url = reverse_lazy('users:profile')
+
+    def get_object(self, queryset=None):
+        return self.request.user

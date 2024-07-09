@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
 
 from catalog.forms import StyleFormMixin
@@ -24,3 +24,13 @@ class UserPasswordResetForm(StyleFormMixin, forms.Form):
         if not User.objects.filter(email=email).exists():
             raise ValidationError("Пользователя с таким email не существует")
         return email
+
+
+class UserProfileForm(StyleFormMixin, UserChangeForm):
+    class Meta:
+        model = User
+        fields = ('email', 'avatar', 'phone', 'country')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['password'].widget = forms.HiddenInput()
