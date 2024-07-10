@@ -39,5 +39,4 @@ class ProductForm(StyleFormMixin, forms.ModelForm):
 class VersionForm(forms.ModelForm):
     class Meta:
         model = Version
-        exclude = ('product', )
-
+        exclude = ('product',)
