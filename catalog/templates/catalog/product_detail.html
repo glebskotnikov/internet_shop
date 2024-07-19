@@ -1,23 +1,43 @@
 {% extends 'catalog/base.html' %}
 {% load my_tags %}
 {% block content %}
-    <div class="row text-center">
-        <div class="card" style="width: 20rem;">
-            <img src="{{ object.photo|mediapath }}" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h4 class="card-title">{{ object.name }}</h4>
-                <p class="card-text">{{ object.description }}</p>
-                <p class="card-text">Категория: {{ object.category }}</p>
-                <p class="card-text">Цена: {{ object.price }} руб.</p>
-                <div class="btn-group">
-                    <a href="{% url 'catalog:home' %}" type="button"
-                       class="btn btn-outline-secondary">Назад</a>
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'catalog:update_product' object.pk %}" type="button"
-                           class="btn btn-sm btn-outline-secondary">Edit</a>
-                        <a href="{% url 'catalog:delete_product' object.pk %}" type="button"
-                           class="btn btn-sm btn-outline-danger">Delete</a>
-                    {% endif %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <!-- Block for headers -->
+                <div class="card-header">
+                    <h4 class="card-title">{{ object.name }}</h4>
+                </div>
+                <div class="row">
+                    <!-- Block for image -->
+                    <div class="col-6">
+                        <div class="card-body d-flex justify-content-center align-items-center">
+                            <img src="{{ object.photo|mediapath }}" class="img-thumbnail" alt="..."
+                                 style="max-width: 300px;">
+                        </div>
+                        <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                            <p class="card-text">Категория: {{ object.category }}</p>
+                            <p class="card-text">Цена: {{ object.price }} руб.</p>
+                            <div class="btn-group">
+                                <a href="{% url 'catalog:home' %}" type="button"
+                                   class="btn btn-outline-secondary">Назад</a>
+                                {% if perms.catalog.set_published_status and perms.catalog.can_edit_description and perms.catalog.can_edit_category or user == product.owner %}
+                                    <a href="{% url 'catalog:update_product' object.pk %}" type="button"
+                                       class="btn btn-sm btn-outline-secondary">Edit</a>
+                                {% endif %}
+                                {% if user.is_superuser or user == product.owner %}
+                                    <a href="{% url 'catalog:delete_product' object.pk %}" type="button"
+                                       class="btn btn-sm btn-outline-danger">Delete</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Block for text -->
+                    <div class="col-6">
+                        <div class="card-body">
+                            <p class="card-text">{{ object.description }}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
