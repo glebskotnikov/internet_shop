@@ -1,28 +1,32 @@
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
 from pytils.translit import slugify
 
+from blog.forms import BlogForm
 from blog.models import Blog
 
 
-class BlogCreateView(CreateView):
+class BlogCreateView(LoginRequiredMixin, CreateView):
     model = Blog
-    fields = ('title', 'content', 'image')
+    form_class = BlogForm
     success_url = reverse_lazy('blog:list')
 
     def form_valid(self, form):
         if form.is_valid():
-            new = form.save()
-            new.slug = slugify(new.title)
-            new.save()
+            blog = form.save()
+            user = self.request.user
+            blog.owner = user
+            blog.slug = slugify(blog.title)
+            blog.save()
 
         return super().form_valid(form)
 
 
-class BlogUpdateView(UpdateView):
+class BlogUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Blog
-    fields = ('title', 'content', 'image')
+    form_class = BlogForm
 
     def form_valid(self, form):
         if form.is_valid():
@@ -35,14 +39,26 @@ class BlogUpdateView(UpdateView):
     def get_success_url(self):
         return reverse('blog:view', args=[self.kwargs.get('slug')])
 
+    def test_func(self):
+        obj = self.get_object()
+        return self.request.user.groups.filter(name='content-manager').exists() or \
+            self.request.user.is_superuser or \
+            obj.owner == self.request.user
+
 
 class BlogListView(ListView):
     model = Blog
+    extra_context = {"title": "Блог"}
 
-    def get_queryset(self, *args, **kwargs):
-        queryset = super().get_queryset(*args, **kwargs)
-        queryset = queryset.filter(is_published=True)
-        return queryset
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated:
+            if user.groups.filter(name='content-manager').exists() or user.is_superuser:
+                return Blog.objects.all()
+            else:
+                return Blog.objects.filter(is_published=True)
+        else:
+            return Blog.objects.filter(is_published=True)
 
 
 class BlogDetailView(DetailView):
@@ -54,10 +70,23 @@ class BlogDetailView(DetailView):
         self.object.save()
         return self.object
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context['user_is_manager'] = user.is_authenticated and (
+                user.groups.filter(name='content-manager').exists() or user.is_superuser)
+        return context
 
-class BlogDeleteView(DeleteView):
+
+class BlogDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Blog
     success_url = reverse_lazy('blog:list')
+
+    def test_func(self):
+        obj = self.get_object()
+        return self.request.user.groups.filter(name='content-manager').exists() or \
+            self.request.user.is_superuser or \
+            obj.owner == self.request.user
 
 
 def toggle_activity(request, slug):
