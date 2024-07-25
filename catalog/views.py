@@ -121,3 +121,9 @@ class CategoryProductsListView(ListView):
 
     def get_queryset(self):
         return Product.objects.filter(category__name=self.kwargs["category"])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        category = Category.objects.get(name=self.kwargs["category"])
+        context['category'] = category
+        return context
