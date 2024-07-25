@@ -12,7 +12,8 @@ from django.views.generic import (
 )
 
 from catalog.forms import ProductForm, VersionForm, ProductModeratorForm
-from catalog.models import Product, Version
+from catalog.models import Product, Version, Category
+from catalog.services import get_cached_categories, get_cached_products
 
 
 class ProductCreateView(LoginRequiredMixin, CreateView):
@@ -30,17 +31,17 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
 
 class ProductListView(ListView):
     model = Product
-    extra_context = {"title": "Каталог"}
+    extra_context = {"title": "Все продукты"}
 
     def get_queryset(self):
         user = self.request.user
         if user.is_authenticated:
             if user.groups.filter(name='moderator').exists() or user.is_superuser:
-                return Product.objects.all()
+                return get_cached_products(is_published=False)
             else:
-                return Product.objects.filter(is_published=True)
+                return get_cached_products(is_published=True)
         else:
-            return Product.objects.filter(is_published=True)
+            return get_cached_products(is_published=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -103,3 +104,20 @@ class ProductDeleteView(LoginRequiredMixin, DeleteView):
 
 class ContactsTemplateView(TemplateView):
     template_name = "catalog/contacts.html"
+
+
+class CategoryListView(ListView):
+    model = Category
+    extra_context = {"title": "Категории продуктов"}
+
+    def get_queryset(self):
+        return get_cached_categories()
+
+
+class CategoryProductsListView(ListView):
+    model = Product
+    template_name = "catalog/category_products.html"
+    context_object_name = "products"
+
+    def get_queryset(self):
+        return Product.objects.filter(category__name=self.kwargs["category"])
