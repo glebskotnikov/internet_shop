@@ -1,0 +1,29 @@
+{% extends 'catalog/base.html' %}
+
+{% block content %}
+    <div class="row text-center">
+        <div class="col-12 mb-5">
+            {% if user.is_authenticated %}
+                {% if category %}
+                    <h1 style="margin-bottom: 30px;">{{ category.name }}</h1>
+                {% endif %}
+                <a class="btn btn-outline-secondary" href="{% url 'catalog:home' %}">Все продукты</a>
+                <a class="btn btn-outline-primary" href="{% url 'catalog:list_category' %}">Категории</a>
+                <a class="btn btn-outline-success" href="{% url 'catalog:create_product' %}">Создать продукт</a>
+            {% endif %}
+        </div>
+        {% for product in products %}
+            <div class="col-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title pricing-card-title">{{ product.name }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-title pricing-card-title">{{ product.description|truncatechars:100 }}</h6>
+                        <a href="{% url 'catalog:view_product' product.id %}" class="btn btn-outline-secondary">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
